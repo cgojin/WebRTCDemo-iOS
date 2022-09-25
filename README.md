@@ -1,77 +1,52 @@
 # WebRTCDemo-iOS
 WebRTC iOS example Xcode project.
 
-## Build WebRTC
-
-[Reference official document](https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/development/index.md)
-
-### Getting the Code
+## Build WebRTC.xcframework
 
 ```sh
-cd $HOME && mkdir c && cd c
-git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-export PATH=$PATH:$HOME/c/depot_tools
+# Make a work directory
+cd $HOME
+mkdir work/webrtc
+cd work/webrtc
 
-cd $HOME/c
-fetch --nohooks webrtc
-gclient sync
+# Building Official Document: https://webrtc.googlesource.com/src/+/refs/heads/main/docs/native-code/development/index.md
+# Building script of stasel/WebRTC: https://github.com/stasel/WebRTC/blob/latest/scripts/build.sh
+# Download building script of stasel/WebRTC
+curl -fsSL -o build.sh https://raw.github.com/stasel/WebRTC/latest/scripts/build.sh
+chmod +x build.sh
 
-cd $HOME/c/src
-git checkout main
-git new-branch my
-```
-### Generate ninja project files
-```sh
-gn gen ./out/ios_arm64 --args='target_os="ios" target_cpu="arm64" ios_deployment_target="10.0" ios_enable_code_signing=false use_xcode_clang=true is_component_build=false rtc_include_tests=false rtc_libvpx_build_vp9=false enable_ios_bitcode=false use_goma=false rtc_enable_symbol_export=true enable_dsyms=true enable_stripping=true is_debug=true'
+# Build the WebRTC.xcframework
+MACOS=true IOS=true BUILD_VP9=true ./build.sh
 
-gn gen ./out/ios_x64 --args='target_os="ios" target_cpu="x64" ios_deployment_target="10.0" ios_enable_code_signing=false use_xcode_clang=true is_component_build=false rtc_include_tests=false rtc_libvpx_build_vp9=false enable_ios_bitcode=false use_goma=false rtc_enable_symbol_export=true enable_dsyms=true enable_stripping=true is_debug=true'
-
-gn gen ./out/mac_x64 --args='target_os="mac" target_cpu="x64" is_component_build=false rtc_include_tests=false rtc_libvpx_build_vp9=false use_goma=false rtc_enable_symbol_export=true enable_dsyms=true enable_stripping=true is_debug=true'
-```
-
-If you compile the release version, please replace *is_debug=true* with *is_debug=false*
-
-### Compile framework
-```sh
-ninja -C out/mac_x64 sdk:mac_framework_objc
-ninja -C out/ios_arm64 sdk:framework_objc
-ninja -C out/ios_x64 sdk:framework_objc
-```
-
-### Create xcframework
-
-```sh
-xcodebuild -create-xcframework \
-	-framework out/ios_arm64/WebRTC.framework \
-	-framework out/ios_x64/WebRTC.framework \
-	-framework out/mac_x64/WebRTC.framework \
-	-output out/WebRTC.xcframework
+# Build WebRTC.xcframework for debugging
+MACOS=true IOS=true BUILD_VP9=true DEBUG=true ./build.sh
 ```
 
 ## Import AppRTCMobile to XCode project
 
 This XCode project has been imported the [AppRTCMobile](https://webrtc.googlesource.com/src/+/refs/heads/main/examples/objc/). If you want to create the Xcode project manually, please refer to the following steps.
 
-* Create a new Xcode project and stored in $HOME/c  
-    File -> New -> Project... -> iOS -> App  
-    Product Name: WebRTCDemo-iOS  
-    Language: Objective-C  
+- Create a new Xcode project and stored in $HOME/work/
+    - File -> New -> Project... -> iOS -> App
+      - Product Name: WebRTCDemo-iOS 
+      - Language: Objective-C 
 
-* Delete all files of WebRTCDemo-iOS group
+- Delete all files of WebRTCDemo-iOS group
 
-* Add ../webrtc/src/examples/objc/* to WebRTCDemo-iOS group, delete tests, mac of WebRTCDemo-iOS/AppRTCMobile group.
+- Add ../webrtc/src/examples/objc/* to WebRTCDemo-iOS group, delete tests, mac of WebRTCDemo-iOS/AppRTCMobile group.
 
-* Configure targets
-    * TARGETS -> WebRTCDemo-iOS -> Build Phases -> Copy Bundle Resources  
+- Configure targets
+    - TARGETS -> WebRTCDemo-iOS -> Build Phases -> Copy Bundle Resources
         Delete the info.plist, fixed building error: Multiple commands produce '.../Info.plist'
 
-    * TARGETS -> WebRTCDemo-iOS -> Build Settings  
-        Info.plist: ../webrtc/src/examples/objc/AppRTCMobile/ios/Info.plist  
-        Header Search Paths: "$(SRCROOT)/../webrtc/src" "$(SRCROOT)/../webrtc/src/sdk/objc/base" "$(SRCROOT)/../webrtc/src/examples/objc/AppRTCMobile"        
-        Enable Bitcode: No  
+    - TARGETS -> WebRTCDemo-iOS -> Build Settings
+        - Info.plist File: ../webrtc/src/examples/objc/AppRTCMobile/ios/Info.plist
+        - Header Search Paths: "$(SRCROOT)/../webrtc/src" "$(SRCROOT)/../webrtc/src/sdk/objc/base" "$(SRCROOT)/../webrtc/src/examples/objc/AppRTCMobile"
+        - Enable Bitcode: No
 
-    * TARGETS -> WebRTCDemo-iOS -> General -> Framework,Librares, and Embedded Content  
+    - TARGETS -> WebRTCDemo-iOS -> General -> Framework,Librares, and Embedded Content
         Add WebRTC.xcframework of webrtc/src/out/ and set Embed & Sign.
 
 ### License
+
 MIT License - see [LICENSE](LICENSE) for full text
