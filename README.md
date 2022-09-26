@@ -26,14 +26,19 @@ MACOS=true IOS=true BUILD_VP9=true DEBUG=true ./build.sh
 
 This XCode project has been imported the [AppRTCMobile](https://webrtc.googlesource.com/src/+/refs/heads/main/examples/objc/). If you want to create the Xcode project manually, please refer to the following steps.
 
-- Create a new Xcode project and stored in $HOME/work/
-    - File -> New -> Project... -> iOS -> App
-      - Product Name: WebRTCDemo-iOS 
-      - Language: Objective-C 
+- Create a new Xcode project and save to $HOME/work/
+  - File -> New -> Project... -> iOS -> App
+    - Product Name: WebRTCDemo-iOS
+    - Language: Objective-C
 
 - Delete all files of WebRTCDemo-iOS group
 
-- Add ../webrtc/src/examples/objc/* to WebRTCDemo-iOS group, delete tests, mac of WebRTCDemo-iOS/AppRTCMobile group.
+- Add Files to WebRTCDemo-iOS group
+  - Add ../webrtc/src/examples/objc/* to WebRTCDemo-iOS group
+    - Added folders: Create groups
+    - Add to targets: WebRTCDemo-iOS
+
+  - Delete tests, mac of WebRTCDemo-iOS/AppRTCMobile group.
 
 - Configure targets
     - TARGETS -> WebRTCDemo-iOS -> Build Phases -> Copy Bundle Resources
@@ -45,7 +50,7 @@ This XCode project has been imported the [AppRTCMobile](https://webrtc.googlesou
         - Enable Bitcode: No
 
     - TARGETS -> WebRTCDemo-iOS -> General -> Framework,Librares, and Embedded Content
-        Add WebRTC.xcframework of webrtc/src/out/ and set Embed & Sign.
+        Add ../webrtc/src/out/WebRTC.xcframework, and set Embed & Sign.
 
 ### License
 
